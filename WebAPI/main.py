@@ -23,12 +23,7 @@ def read_root():
 # ===グラフ表示用データ=============================================================================    
 @app.post("/GraphData/")
 async def get_Graph_data(date_range: schemas.DateRange,db: Session = Depends(get_db)):
-    buf = crud.get_Graph_data(db=db,date_range=date_range)
-
-    return buf
-
-
-
+    return crud.get_Graph_data(db=db,date_range=date_range)
 
 
 # ===実績系統======================================================================================
