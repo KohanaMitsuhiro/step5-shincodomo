@@ -1,5 +1,66 @@
-from sqlalchemy.orm import Session,joinedload
+from sqlalchemy.orm import Session
+from fastapi.encoders import jsonable_encoder
 from . import models, schemas
+
+
+
+# ===グラフ用データ=================================================================================
+def get_Graph_data(db: Session,date_range:schemas.DateRange):
+
+    # ===実績(基本的には空で返ってくるはず。)=========================================================
+    # 日付範囲とステータス"Done"を満たすレコードを結合して取得
+    resultsdata = db.query(models.ResultsGraphData).join(models.ProductStatus).filter(
+        models.ProductStatus.status == "Done",
+        models.ResultsGraphData.date >= date_range.start_date,
+        models.ResultsGraphData.date <= date_range.end_date
+    ).all()
+    # 取得したデータを辞書に変換し、"status": "Done"を各辞書に追加
+    resultsLIST= []
+    for data in resultsdata:
+        data_dict = {**data.__dict__}
+        data_dict.pop("_sa_instance_state", None)  # SQLAlchemyインスタンスの状態情報を削除
+        data_dict['status'] = 'Done'  # 'status'キーを追加
+        resultsLIST.append(data_dict)
+
+    # ===見積り====================================================================================
+    # 日付範囲とステータス"Quote"を満たすレコードを結合して取得
+    quotedata = db.query(models.QuoteGraphData).join(models.ProductStatus).filter(
+        models.ProductStatus.status == "Quote",
+        models.QuoteGraphData.date >= date_range.start_date,
+        models.QuoteGraphData.date <= date_range.end_date
+    ).all()
+    # 取得したデータを辞書に変換し、"status": "Quote"を各辞書に追加
+    quoteLIST= []
+    for data in quotedata:
+        data_dict = {**data.__dict__}
+        data_dict.pop("_sa_instance_state", None)  # SQLAlchemyインスタンスの状態情報を削除
+        data_dict['status'] = 'Quote'  # 'status'キーを追加
+        quoteLIST.append(data_dict)
+
+    # ===予測======================================================================================
+    # 日付範囲とステータス"Predict"を満たすレコードを結合して取得
+    predictiondata = db.query(models.PredictionGraphData).join(models.ProductStatus).filter(
+        models.ProductStatus.status == "Predict",
+        models.PredictionGraphData.date >= date_range.start_date,
+        models.PredictionGraphData.date <= date_range.end_date
+    ).all()
+    # 取得したデータを辞書に変換し、"status": "Predict"を各辞書に追加
+    predictionLIST= []
+    for data in predictiondata:
+        data_dict = {**data.__dict__}
+        data_dict.pop("_sa_instance_state", None)  # SQLAlchemyインスタンスの状態情報を削除
+        data_dict['status'] = 'Predict'  # 'status'キーを追加
+        predictionLIST.append(data_dict)
+
+    # 取得データの統合
+    GraphDataList=[]
+    GraphDataList.extend(resultsLIST)
+    GraphDataList.extend(quoteLIST)
+    GraphDataList.extend(predictionLIST)
+
+    # JSON応答として適切にシリアライズ
+    json_compatible_GraphDataList = jsonable_encoder(GraphDataList)
+    return json_compatible_GraphDataList
 
 
 # ===実績系統======================================================================================

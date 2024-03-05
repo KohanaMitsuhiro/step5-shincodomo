@@ -19,6 +19,18 @@ def get_db():
 def read_root():
     return {"Hello": "World"}
 
+
+# ===グラフ表示用データ=============================================================================    
+@app.post("/GraphData/")
+async def get_Graph_data(date_range: schemas.DateRange,db: Session = Depends(get_db)):
+    buf = crud.get_Graph_data(db=db,date_range=date_range)
+
+    return buf
+
+
+
+
+
 # ===実績系統======================================================================================
 # 工事番号から実績データを取得
 @app.get("/results/{id}")
@@ -71,3 +83,5 @@ async def get_prediction_data(date_range: schemas.DateRange,db: Session = Depend
 @app.post("/prediction_Graph/")
 async def get_prediction_Graph_data(date_range: schemas.DateRange,db: Session = Depends(get_db)):
     return crud.get_prediction_Graph_data(db=db,date_range=date_range)
+
+
