@@ -11,6 +11,7 @@ class DivisionCapacity(Base):
     Capacity_id = Column(VARCHAR(10), primary_key=True)
     division_id = Column(VARCHAR(10), unique=True)
     capacity_hours = Column(Integer)
+    
 
 # Productステータステーブル
 class ProductStatus(Base):

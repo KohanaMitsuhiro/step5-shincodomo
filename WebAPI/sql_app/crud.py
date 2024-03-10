@@ -1,4 +1,7 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func,Integer
+from sqlalchemy.sql.expression import cast
+
 from fastapi.encoders import jsonable_encoder
 from . import models, schemas
 
@@ -131,6 +134,23 @@ def get_prediction_Graph_data(db: Session,date_range:schemas.DateRange):
         models.PredictionGraphData.date <= date_range.end_date
     ).all()
 
+# IDの一番大きなものを取得する
+def get_max_predid(db:Session):
+    # 予測ID(PRE01025)の数値部分を取り出し、最大値を取得するクエリ
+    maxid = db.query(func.max(cast(func.substr(models.PredictionManHours.Prediction_id,4),Integer))).scalar()    
+    return maxid
+
+# product_idの一番大きなモノを取得する
+def get_max_productid(db:Session):
+    # 最大値を取得するクエリ
+    maxid = db.query(func.max(models.PredictionManHours.product_id)).scalar()    
+    return maxid
+
+# 受け取ったデータを予測DBに書き込む
+def create_prediction_data(db: Session,writeData:schemas.PredictionManHours):
+    db.add(writeData)
+    db.commit()
+    db.refresh(writeData)
 
 
 # 部門名から限界時間の取得

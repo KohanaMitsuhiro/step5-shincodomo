@@ -7,9 +7,22 @@ from datetime import date
 
 # 期間指定用のリクエストモデルの定義
 class DateRange(BaseModel):
-    start_date: date = Field(...,examples="2023-03-12")
-    end_date: date = Field(...,examples="2023-04-12")
+    start_date: date = Field(...,examples=["2023-03-12"])
+    end_date: date = Field(...,examples=["2023-04-12"])
 
+# # stlモデル受取用モデル
+# class STLMode(BaseModel):
+#     end_date:date = Field(...,examples="2023-04-12")
+#     STL-model:UploadFile
+
+class DivisionCapacityModel(BaseModel):
+    Capacity_id: str
+    division_id: str
+    capacity_hours: int
+
+    class Config:
+        # orm_mode = True
+        from_attributes = True
 
 class QuoteBase(BaseModel):
     pass
@@ -34,17 +47,33 @@ class Quote(QuoteBase):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
-class DivisionCapacityBase(BaseModel):
+class PredictBase(BaseModel):
+
+    cavity_number :int 
+    sekkei : int
+    seizou1 : int
+    seizou2 : int
+    seizou3 : int
+    seizou4 : int
+    kumitate : int
+    start_day : date
+    end_day :date
+
+
     pass
 
 
+class PredictCreate(PredictBase):
+    
+    pass
 
-class DivisionCapacity(DivisionCapacityBase):
-    Capacity_id : str
-    division_id : str
-    capacity_hours :int 
 
+class PredictionManHours(PredictBase):
+    Prediction_id : str
+    product_id : int
     class Config:
         orm_mode = True
+        from_attributes = True
